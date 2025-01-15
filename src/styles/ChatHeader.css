@@ -1,0 +1,31 @@
+.chat-header {
+    padding: 15px;
+    border-bottom: 1px solid #e1e1e1;
+    display: flex;
+    align-items: center;
+  }
+  
+  .chat-header__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #e1e1e1;
+    margin-right: 12px;
+  }
+  
+  .chat-header__info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .chat-header__name {
+    font-weight: bold;
+  }
+  
+  .chat-header__status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #4caf50;
+    margin-left: 8px;
+  }

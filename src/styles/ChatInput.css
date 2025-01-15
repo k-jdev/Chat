@@ -1,0 +1,12 @@
+.chat-input {
+    padding: 15px;
+    border-top: 1px solid #e1e1e1;
+  }
+  
+  .chat-input__field {
+    width: 100%;
+    padding: 10px 5px;
+    border: 1px solid #e1e1e1;
+    border-radius: 20px;
+    resize: none;
+  }
