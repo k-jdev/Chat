@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../../styles/ChatInput.css";
+import { PiTelegramLogo } from "react-icons/pi";
 
 const ChatInput = ({ onSendMessage }) => {
   const [input, setInput] = useState("");
@@ -20,7 +21,9 @@ const ChatInput = ({ onSendMessage }) => {
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <button onClick={handleSend}>Send</button>
+      <button onClick={handleSend}>
+        <PiTelegramLogo />
+      </button>
     </div>
   );
 };
