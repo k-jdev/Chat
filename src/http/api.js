@@ -63,7 +63,7 @@ export const getUsers = async () => {
 
 export const searchChats = async (searchTerm) => {
   const response = await axios.get(
-    `/api/chats?search=${encodeURIComponent(searchTerm)}`
+    `${API_URL}/chats?search=${encodeURIComponent(searchTerm)}`
   );
   return response.data;
 };
