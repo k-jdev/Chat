@@ -7,6 +7,7 @@ import { useState } from "react";
 
 function Home() {
   const [selectedChatId, setSelectedChatId] = useState(null);
+
   return (
     <div className="app">
       <ChatList onSelectChat={(chatId) => setSelectedChatId(chatId)} />

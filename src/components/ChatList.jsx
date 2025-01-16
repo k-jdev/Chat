@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getUsers, searchChats } from "../http/api";
+import { getUsers, searchChats, getLastMessageByChatId } from "../http/api";
 import "../styles/ChatList.css";
 import User from "./User";
 import SearchBar from "./SideBar/SearchBar";
@@ -7,19 +7,30 @@ import { faker } from "@faker-js/faker";
 
 const ChatList = ({ onSelectChat }) => {
   const [users, setUsers] = useState([]);
+  const [lastMessages, setLastMessages] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let fetchedUsers;
-        if (searchTerm) {
-          fetchedUsers = await searchChats(searchTerm); // Поиск по запросу
-        } else {
-          fetchedUsers = await getUsers(); // Получение всех пользователей
-        }
+        let fetchedUsers = searchTerm
+          ? await searchChats(searchTerm)
+          : await getUsers();
         setUsers(fetchedUsers);
+
+        // Загружаем последние сообщения
+        const lastMessagesData = {};
+        await Promise.all(
+          fetchedUsers.map(async (user) => {
+            const lastMessage = await getLastMessageByChatId(user._id);
+            lastMessagesData[user._id] = lastMessage || {
+              content: "No messages yet",
+              createdAt: "",
+            };
+          })
+        );
+        setLastMessages(lastMessagesData);
       } catch (error) {
         setError("Failed to fetch users");
       }
@@ -30,23 +41,19 @@ const ChatList = ({ onSelectChat }) => {
 
   return (
     <div className="chat-list-container">
-      <SearchBar onSearch={(term) => setSearchTerm(term)} />{" "}
-      {/* Добавляем SearchBar */}
+      <SearchBar onSearch={(term) => setSearchTerm(term)} />
       <h2>Chats</h2>
       {error && <div className="error">{error}</div>}
-      {/* {users.map((user) => {
-        console.log(user);
-      })} */}
       {users.map((user) => (
-        <div
-          key={user._id}
-          onClick={() => onSelectChat(user._id)} // Передаём chatId
-        >
+        <div key={user._id} onClick={() => onSelectChat(user._id)}>
           <User
             firstName={user.firstName}
+            lastName={user.lastName}
             avatar={user.avatar || faker.image.avatar()}
-            lastMessage={user.messages[0]?.content || "No messages yet"}
-            lastDate={user.messages[0]?.createdAt || ""}
+            lastMessage={lastMessages[user._id]?.content}
+            lastDate={new Date(
+              lastMessages[user._id]?.createdAt
+            ).toLocaleString()}
           />
         </div>
       ))}

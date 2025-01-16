@@ -49,6 +49,15 @@ export const getMessagesByChat = async (chatId) => {
     throw error;
   }
 };
+export const getLastMessageByChatId = async (chatId) => {
+  try {
+    const response = await axios.get(`${API_URL}/messages/${chatId}/last`);
+    return response.data; // Возвращает последнее сообщение
+  } catch (error) {
+    console.error("Ошибка при получении последнего сообщения:", error);
+    return null;
+  }
+};
 
 export const getUsers = async () => {
   try {
