@@ -25,7 +25,7 @@ const SearchBar = ({ onSearch }) => {
     <div className="search-bar">
       <input
         type="text"
-        placeholder="Search or start new chat"
+        placeholder="Знайти чат"
         className="search-bar__input"
         value={searchTerm}
         onChange={handleInputChange}
