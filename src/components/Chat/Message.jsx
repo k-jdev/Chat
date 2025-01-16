@@ -1,12 +1,20 @@
 import "../../styles/Message.css";
 
-const Message = ({ content, time, isOutgoing }) => {
+const Message = ({ content, createdAt, sender }) => {
+  const isOutgoing = sender === "user"; // Определяем, кто отправил
+
   return (
-    <div className={`message ${isOutgoing ? "message--outgoing" : ""}`}>
+    <div
+      className={`message ${
+        isOutgoing ? "message--outgoing" : "message--incoming"
+      }`}
+    >
       {!isOutgoing && <div className="message__avatar" />}
-      <div>
+      <div className="message__wrapper">
         <div className="message__content">{content}</div>
-        <div className="message__time">{time}</div>
+        <div className="message__time">
+          {new Date(createdAt).toLocaleTimeString()}
+        </div>
       </div>
     </div>
   );

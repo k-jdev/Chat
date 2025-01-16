@@ -43,7 +43,7 @@ export const sendMessage = async (chatId, content, sender) => {
 export const getMessagesByChat = async (chatId) => {
   try {
     const response = await axios.get(`${API_URL}/messages/${chatId}`);
-    return response.data;
+    return response.data; // Возвращает массив сообщений
   } catch (error) {
     console.error("Error fetching messages:", error);
     throw error;
@@ -66,6 +66,17 @@ export const searchChats = async (searchTerm) => {
     `${API_URL}/chats?search=${encodeURIComponent(searchTerm)}`
   );
   return response.data;
+};
+
+export const getChatById = async (chatId) => {
+  try {
+    const response = await axios.get(`${API_URL}/chats/${chatId}`);
+    console.log(response);
+    return response.data; // Возвращаем объект чата
+  } catch (error) {
+    console.error("Error fetching chat by ID:", error);
+    throw error;
+  }
 };
 
 export default $api;

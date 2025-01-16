@@ -1,0 +1,64 @@
+/* User.css */
+
+.user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s, box-shadow 0.3s;
+  }
+  
+  .user-card:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user__avatar {
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .user__avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    transition: border-color 0.3s;
+  }
+  
+  .user__avatar img:hover {
+    border-color: #007bff;
+  }
+  
+  .user__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user__name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .user__last-message {
+    font-size: 12px;
+    color: #666;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .user__last-date {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+  }
+  

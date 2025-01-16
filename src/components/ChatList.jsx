@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
-import "../styles/ChatList.css";
 import { getUsers, searchChats } from "../http/api";
-import { faker } from "@faker-js/faker";
+import "../styles/ChatList.css";
+import User from "./User";
 import SearchBar from "./SideBar/SearchBar";
+import { faker } from "@faker-js/faker";
 
-function ChatList() {
+const ChatList = ({ onSelectChat }) => {
   const [users, setUsers] = useState([]);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         let fetchedUsers;
         if (searchTerm) {
-          fetchedUsers = await searchChats(searchTerm);
+          fetchedUsers = await searchChats(searchTerm); // Поиск по запросу
         } else {
-          fetchedUsers = await getUsers();
+          fetchedUsers = await getUsers(); // Получение всех пользователей
         }
         setUsers(fetchedUsers);
       } catch (error) {
@@ -29,33 +30,28 @@ function ChatList() {
 
   return (
     <div className="chat-list-container">
-      <SearchBar onSearch={(term) => setSearchTerm(term)} />
-
+      <SearchBar onSearch={(term) => setSearchTerm(term)} />{" "}
+      {/* Добавляем SearchBar */}
       <h2>Chats</h2>
       {error && <div className="error">{error}</div>}
-      {users.length === 0 && !error ? <div>No users available</div> : null}
-      {Array.isArray(users) && users.length > 0 ? (
-        users.map((user) => (
-          <div className="user-card" key={user._id}>
-            <img
-              src={user.avatar || faker.image.avatar()}
-              alt={`${user.firstName || "Unknown"}'s avatar`}
-              className="avatar"
-            />
-            <div className="user-info">
-              <p className="user-name">{user.firstName || "No Name"}</p>
-              <p className="user-message">
-                {user.updatedAt || "No messages yet"}
-              </p>
-            </div>
-            <p className="user-date">{user.lastDate || " "}</p>
-          </div>
-        ))
-      ) : (
-        <div>No users available</div>
-      )}
+      {/* {users.map((user) => {
+        console.log(user);
+      })} */}
+      {users.map((user) => (
+        <div
+          key={user._id}
+          onClick={() => onSelectChat(user._id)} // Передаём chatId
+        >
+          <User
+            firstName={user.firstName}
+            avatar={user.avatar || faker.image.avatar()}
+            lastMessage={user.messages[0]?.content || "No messages yet"}
+            lastDate={user.messages[0]?.createdAt || ""}
+          />
+        </div>
+      ))}
     </div>
   );
-}
+};
 
 export default ChatList;

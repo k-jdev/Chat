@@ -1,16 +1,17 @@
 import React from "react";
+import "../styles/User.css";
 
 const User = ({ firstName, avatar, lastMessage, lastDate }) => {
   return (
-    <div className="user">
+    <div className="user-card">
       <div className="user__avatar">
-        <img src={avatar} alt="User avatar" />
+        <img src={avatar} alt={`${firstName}'s avatar`} className="avatar" />
       </div>
       <div className="user__info">
-        <div className="user__name">{`${firstName}`}</div>
-        <div className="user__last-message">{lastMessage}</div>
-        <div className="user__last-date">{lastDate}</div>
+        <p className="user__name">{firstName}</p>
+        <p className="user__last-message">{lastMessage}</p>
       </div>
+      <p className="user__last-date">{lastDate}</p>
     </div>
   );
 };
