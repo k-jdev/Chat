@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { register, googleLogin } from "../store/features/authSlice"; // ✅ Добавляем googleLogin
+import { register, googleLogin } from "../store/features/authSlice";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -36,6 +36,8 @@ function Register() {
 
     const result = await dispatch(register(formData));
     if (register.fulfilled.match(result)) {
+      const user = result.payload; // Данные пользователя
+      localStorage.setItem("user", JSON.stringify(user)); // Сохраняем в localStorage
       navigate("/");
     }
   };
@@ -44,7 +46,9 @@ function Register() {
     const token = response.credential;
     dispatch(googleLogin(token)).then((result) => {
       if (googleLogin.fulfilled.match(result)) {
-        navigate("/"); // ✅ Перенаправление при успехе
+        const user = result.payload;
+        localStorage.setItem("user", JSON.stringify(user)); // Сохраняем Google пользователя
+        navigate("/");
       }
     });
   };
@@ -112,6 +116,17 @@ function Register() {
         </div>
 
         {error && <p className={styles.error}>{error.message}</p>}
+
+        <p className={styles.switchText}>
+          Уже зареєстровані?
+          <motion.button
+            className={styles.switchButton}
+            onClick={() => navigate("/login")}
+            whileHover={{ scale: 1.1 }}
+          >
+            Увійти
+          </motion.button>
+        </p>
       </form>
     </motion.div>
   );

@@ -52,8 +52,8 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: JSON.parse(localStorage.getItem("user")) || null,
-    isLoading: null,
-    loading: false,
+    isLoading: false,
+    error: null,
   },
   reducers: {
     logout(state) {

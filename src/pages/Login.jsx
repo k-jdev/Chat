@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, googleLogin } from "../store/features/authSlice"; // ✅ Подключаем login и googleLogin
+import { login, googleLogin } from "../store/features/authSlice";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -9,7 +9,7 @@ import styles from "../styles/Login.module.css";
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state) => state.auth); // ✅ Получаем состояние логина
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -29,7 +29,9 @@ function Login() {
 
     const result = await dispatch(login(formData));
     if (login.fulfilled.match(result)) {
-      navigate("/"); // ✅ Перенаправляем при успехе
+      const user = result.payload; // Данные пользователя
+      localStorage.setItem("user", JSON.stringify(user)); // Сохраняем в localStorage
+      navigate("/");
     }
   };
 
@@ -37,6 +39,8 @@ function Login() {
     const token = response.credential;
     dispatch(googleLogin(token)).then((result) => {
       if (googleLogin.fulfilled.match(result)) {
+        const user = result.payload;
+        localStorage.setItem("user", JSON.stringify(user)); // Сохраняем Google пользователя
         navigate("/");
       }
     });

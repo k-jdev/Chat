@@ -9,6 +9,7 @@ const ChatArea = ({ chatId }) => {
   const [messages, setMessages] = useState([]);
   const [chatInfo, setChatInfo] = useState({});
   const [error, setError] = useState(null);
+  const [ws, setWs] = useState(null); // WebSocket
 
   useEffect(() => {
     const fetchChatData = async () => {
@@ -33,6 +34,53 @@ const ChatArea = ({ chatId }) => {
     }
   }, [chatId]);
 
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3002");
+
+    socket.onopen = () => {
+      console.log("WebSocket подключен");
+      setWs(socket);
+
+      // Отправляем информацию о чате при подключении
+      socket.send(JSON.stringify({ type: "join", chatId }));
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.chatId === chatId) {
+        setMessages((prevMessages) => [...prevMessages, data]);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket отключен");
+    };
+
+    socket.onerror = (err) => {
+      console.error("WebSocket ошибка:", err);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [chatId]);
+
+  const handleSendMessage = async (content) => {
+    try {
+      // Отправляем сообщение на сервер
+      const newMessage = await sendMessage(chatId, content, "user");
+      setMessages((prev) => [...prev, newMessage]);
+
+      // Передаём сообщение через WebSocket
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "message", chatId, content }));
+      }
+    } catch (err) {
+      setError("Ошибка отправки сообщения");
+    }
+  };
+
   return (
     <div className="chat-area">
       <ChatHeader name={chatInfo.firstName} avatar={chatInfo.avatar} />
@@ -42,16 +90,7 @@ const ChatArea = ({ chatId }) => {
           <Message key={message._id} {...message} />
         ))}
       </div>
-      <ChatInput
-        onSendMessage={async (content) => {
-          try {
-            const newMessage = await sendMessage(chatId, content, "user");
-            setMessages((prev) => [...prev, newMessage]);
-          } catch (err) {
-            setError("Ошибка отправки сообщения");
-          }
-        }}
-      />
+      <ChatInput onSendMessage={handleSendMessage} />
     </div>
   );
 };
