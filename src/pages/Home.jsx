@@ -21,7 +21,7 @@ function Home() {
       {selectedChatId ? (
         <ChatArea chatId={selectedChatId} />
       ) : (
-        <p>Select a chat</p>
+        <button onClick={handleLogout}>Logout</button>
       )}
     </div>
   );
