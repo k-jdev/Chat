@@ -49,7 +49,13 @@ const ChatArea = ({ chatId }) => {
       const data = JSON.parse(event.data);
 
       if (data.chatId === chatId) {
-        setMessages((prevMessages) => [...prevMessages, data]);
+        setMessages((prevMessages) => {
+          // Проверяем, есть ли уже это сообщение в списке
+          if (prevMessages.some((msg) => msg._id === data._id)) {
+            return prevMessages;
+          }
+          return [...prevMessages, data];
+        });
       }
     };
 
@@ -68,13 +74,20 @@ const ChatArea = ({ chatId }) => {
 
   const handleSendMessage = async (content) => {
     try {
-      // Отправляем сообщение на сервер
+      // Отправляем сообщение на сервер через API
       const newMessage = await sendMessage(chatId, content, "user");
       setMessages((prev) => [...prev, newMessage]);
 
       // Передаём сообщение через WebSocket
       if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: "message", chatId, content }));
+        ws.send(
+          JSON.stringify({
+            type: "message",
+            chatId,
+            content,
+            _id: newMessage._id,
+          })
+        );
       }
     } catch (err) {
       setError("Ошибка отправки сообщения");

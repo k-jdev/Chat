@@ -50,25 +50,27 @@ const ChatList = ({ onSelectChat }) => {
       <h2 className="chat-list-title">Чати</h2>
       {error && <div className="error">{error}</div>}
       <div className="chat-list">
-        {users.map((user) => (
-          <motion.div
-            key={user._id}
-            onClick={() => onSelectChat(user._id)}
-            className="chat-item"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <User
-              firstName={user.firstName}
-              lastName={user.lastName}
-              avatar={user.avatar || faker.image.avatar()}
-              lastMessage={lastMessages[user._id]?.content}
-              lastDate={new Date(
-                lastMessages[user._id]?.createdAt
-              ).toLocaleString()}
-            />
-          </motion.div>
-        ))}
+        <div className="chat-list-scrollable">
+          {users.map((user) => (
+            <motion.div
+              key={user._id}
+              onClick={() => onSelectChat(user._id)}
+              className="chat-item"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <User
+                firstName={user.firstName}
+                lastName={user.lastName}
+                avatar={user.avatar || faker.image.avatar()}
+                lastMessage={lastMessages[user._id]?.content}
+                lastDate={new Date(
+                  lastMessages[user._id]?.createdAt
+                ).toLocaleString()}
+              />
+            </motion.div>
+          ))}
+        </div>
       </div>
     </motion.div>
   );
