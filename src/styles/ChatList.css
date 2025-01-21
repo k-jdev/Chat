@@ -21,7 +21,7 @@ body {
   .chat-list-container {
     display: flex;
     flex-direction: column;
-    height: 100%; /* Висота контейнера */
+    height: 97%; /* Висота контейнера */
     max-width: 400px;
     margin: 0 auto;
     background: white;

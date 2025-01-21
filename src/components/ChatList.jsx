@@ -11,6 +11,7 @@ const ChatList = ({ onSelectChat }) => {
   const [lastMessages, setLastMessages] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
+  const [avatars, setAvatars] = useState({});
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -18,6 +19,7 @@ const ChatList = ({ onSelectChat }) => {
         let fetchedUsers = searchTerm
           ? await searchChats(searchTerm)
           : await getUsers();
+
         setUsers(fetchedUsers);
 
         const lastMessagesData = {};
@@ -31,6 +33,18 @@ const ChatList = ({ onSelectChat }) => {
           })
         );
         setLastMessages(lastMessagesData);
+
+        const storedAvatars = JSON.parse(localStorage.getItem("avatars")) || {};
+        const newAvatars = { ...storedAvatars };
+
+        fetchedUsers.forEach((user) => {
+          if (!storedAvatars[user._id]) {
+            newAvatars[user._id] = user.avatar || faker.image.avatar();
+          }
+        });
+
+        setAvatars(newAvatars);
+        localStorage.setItem("avatars", JSON.stringify(newAvatars));
       } catch (error) {
         setError("Failed to fetch users");
       }
@@ -38,6 +52,14 @@ const ChatList = ({ onSelectChat }) => {
 
     fetchUsers();
   }, [searchTerm]);
+
+  const handleSelectChat = (user) => {
+    onSelectChat({
+      chatId: user._id,
+      avatar: avatars[user._id],
+      name: `${user.firstName} ${user.lastName}`,
+    });
+  };
 
   return (
     <motion.div
@@ -54,7 +76,7 @@ const ChatList = ({ onSelectChat }) => {
           {users.map((user) => (
             <motion.div
               key={user._id}
-              onClick={() => onSelectChat(user._id)}
+              onClick={() => handleSelectChat(user)}
               className="chat-item"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -62,7 +84,7 @@ const ChatList = ({ onSelectChat }) => {
               <User
                 firstName={user.firstName}
                 lastName={user.lastName}
-                avatar={user.avatar || faker.image.avatar()}
+                avatar={avatars[user._id]}
                 lastMessage={lastMessages[user._id]?.content}
                 lastDate={new Date(
                   lastMessages[user._id]?.createdAt

@@ -3,34 +3,25 @@ import "../../styles/ChatArea.css";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import Message from "./Message";
-import { getMessagesByChat, sendMessage, getChatById } from "../../http/api";
+import { getMessagesByChat, sendMessage } from "../../http/api";
 
-const ChatArea = ({ chatId }) => {
+const ChatArea = ({ chatId, chatInfo }) => {
   const [messages, setMessages] = useState([]);
-  const [chatInfo, setChatInfo] = useState({});
   const [error, setError] = useState(null);
-  const [ws, setWs] = useState(null); // WebSocket
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const fetchChatData = async () => {
+    const fetchMessages = async () => {
       try {
-        // Загружаем данные чата
-        const chatData = await getChatById(chatId);
-        setChatInfo({
-          firstName: chatData.firstName,
-          avatar: chatData.userId.avatar,
-        });
-
-        // Загружаем сообщения чата
         const fullMessages = await getMessagesByChat(chatId);
         setMessages(fullMessages);
       } catch (err) {
-        setError("Ошибка загрузки чата");
+        setError("Ошибка загрузки сообщений");
       }
     };
 
     if (chatId) {
-      fetchChatData();
+      fetchMessages();
     }
   }, [chatId]);
 
@@ -41,7 +32,6 @@ const ChatArea = ({ chatId }) => {
       console.log("WebSocket подключен");
       setWs(socket);
 
-      // Отправляем информацию о чате при подключении
       socket.send(JSON.stringify({ type: "join", chatId }));
     };
 
@@ -50,7 +40,6 @@ const ChatArea = ({ chatId }) => {
 
       if (data.chatId === chatId) {
         setMessages((prevMessages) => {
-          // Проверяем, есть ли уже это сообщение в списке
           if (prevMessages.some((msg) => msg._id === data._id)) {
             return prevMessages;
           }
@@ -63,10 +52,6 @@ const ChatArea = ({ chatId }) => {
       console.log("WebSocket отключен");
     };
 
-    socket.onerror = (err) => {
-      console.error("WebSocket ошибка:", err);
-    };
-
     return () => {
       socket.close();
     };
@@ -74,11 +59,9 @@ const ChatArea = ({ chatId }) => {
 
   const handleSendMessage = async (content) => {
     try {
-      // Отправляем сообщение на сервер через API
       const newMessage = await sendMessage(chatId, content, "user");
       setMessages((prev) => [...prev, newMessage]);
 
-      // Передаём сообщение через WebSocket
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(
           JSON.stringify({
@@ -96,7 +79,7 @@ const ChatArea = ({ chatId }) => {
 
   return (
     <div className="chat-area">
-      <ChatHeader name={chatInfo.firstName} avatar={chatInfo.avatar} />
+      <ChatHeader name={chatInfo.name} avatar={chatInfo.avatar} />
       {error && <div className="error">{error}</div>}
       <div className="chat-area__messages">
         {messages.map((message) => (
