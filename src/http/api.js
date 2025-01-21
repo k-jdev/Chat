@@ -62,7 +62,6 @@ export const getLastMessageByChatId = async (chatId) => {
 export const getUsers = async () => {
   try {
     const response = await axios.get(`${API_URL}/chats`);
-
     return response.data;
   } catch (error) {
     console.error("Error fetching users:", error);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import "../../styles/ChatInput.css";
 import { PiTelegramLogo } from "react-icons/pi";
+import { motion } from "framer-motion";
+import styles from "../../styles/ChatInput.module.css";
 
 const ChatInput = ({ onSendMessage }) => {
   const [input, setInput] = useState("");
@@ -12,18 +13,30 @@ const ChatInput = ({ onSendMessage }) => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSend();
+    }
+  };
+
   return (
-    <div className="chat-input">
+    <div className={styles.chatInput}>
       <input
         type="text"
-        placeholder="Type your message"
-        className="chat-input__field"
+        placeholder="Написати повідомлення..."
+        className={styles.chatInputField}
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyPress={handleKeyPress}
       />
-      <button onClick={handleSend}>
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={handleSend}
+        className={styles.sendButton}
+      >
         <PiTelegramLogo />
-      </button>
+      </motion.button>
     </div>
   );
 };

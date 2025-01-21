@@ -3,55 +3,90 @@ import "../../styles/ChatArea.css";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
 import Message from "./Message";
-import { getMessagesByChat, sendMessage, getChatById } from "../../http/api";
+import { getMessagesByChat, sendMessage } from "../../http/api";
 
-const ChatArea = ({ chatId }) => {
+const ChatArea = ({ chatId, chatInfo }) => {
   const [messages, setMessages] = useState([]);
-  const [chatInfo, setChatInfo] = useState({});
   const [error, setError] = useState(null);
+  const [ws, setWs] = useState(null);
 
   useEffect(() => {
-    const fetchChatData = async () => {
+    const fetchMessages = async () => {
       try {
-        // Загружаем данные чата
-        const chatData = await getChatById(chatId);
-        setChatInfo({
-          firstName: chatData.firstName,
-          avatar: chatData.userId.avatar,
-        });
-
-        // Загружаем сообщения чата
         const fullMessages = await getMessagesByChat(chatId);
         setMessages(fullMessages);
       } catch (err) {
-        setError("Ошибка загрузки чата");
+        setError("Ошибка загрузки сообщений");
       }
     };
 
     if (chatId) {
-      fetchChatData();
+      fetchMessages();
     }
   }, [chatId]);
 
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:3002");
+
+    socket.onopen = () => {
+      console.log("WebSocket подключен");
+      setWs(socket);
+
+      socket.send(JSON.stringify({ type: "join", chatId }));
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.chatId === chatId) {
+        setMessages((prevMessages) => {
+          if (prevMessages.some((msg) => msg._id === data._id)) {
+            return prevMessages;
+          }
+          return [...prevMessages, data];
+        });
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket отключен");
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [chatId]);
+
+  const handleSendMessage = async (content) => {
+    try {
+      const newMessage = await sendMessage(chatId, content, "user");
+      setMessages((prev) => [...prev, newMessage]);
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(
+          JSON.stringify({
+            type: "message",
+            chatId,
+            content,
+            _id: newMessage._id,
+          })
+        );
+      }
+    } catch (err) {
+      setError("Ошибка отправки сообщения");
+    }
+  };
+
   return (
     <div className="chat-area">
-      <ChatHeader name={chatInfo.firstName} avatar={chatInfo.avatar} />
+      <ChatHeader name={chatInfo.name} avatar={chatInfo.avatar} />
       {error && <div className="error">{error}</div>}
       <div className="chat-area__messages">
         {messages.map((message) => (
           <Message key={message._id} {...message} />
         ))}
       </div>
-      <ChatInput
-        onSendMessage={async (content) => {
-          try {
-            const newMessage = await sendMessage(chatId, content, "user");
-            setMessages((prev) => [...prev, newMessage]);
-          } catch (err) {
-            setError("Ошибка отправки сообщения");
-          }
-        }}
-      />
+      <ChatInput onSendMessage={handleSendMessage} />
     </div>
   );
 };

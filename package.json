@@ -13,6 +13,7 @@
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.5.0",
     "axios": "^1.7.9",
+    "framer-motion": "^11.18.0",
     "i": "^0.3.7",
     "lodash": "^4.17.21",
     "npm": "^10.9.2",

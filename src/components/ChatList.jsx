@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { getUsers, searchChats, getLastMessageByChatId } from "../http/api";
 import "../styles/ChatList.css";
 import User from "./User";
@@ -10,6 +11,7 @@ const ChatList = ({ onSelectChat }) => {
   const [lastMessages, setLastMessages] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
+  const [avatars, setAvatars] = useState({});
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -17,9 +19,9 @@ const ChatList = ({ onSelectChat }) => {
         let fetchedUsers = searchTerm
           ? await searchChats(searchTerm)
           : await getUsers();
+
         setUsers(fetchedUsers);
 
-        // Загружаем последние сообщения
         const lastMessagesData = {};
         await Promise.all(
           fetchedUsers.map(async (user) => {
@@ -31,6 +33,18 @@ const ChatList = ({ onSelectChat }) => {
           })
         );
         setLastMessages(lastMessagesData);
+
+        const storedAvatars = JSON.parse(localStorage.getItem("avatars")) || {};
+        const newAvatars = { ...storedAvatars };
+
+        fetchedUsers.forEach((user) => {
+          if (!storedAvatars[user._id]) {
+            newAvatars[user._id] = user.avatar || faker.image.avatar();
+          }
+        });
+
+        setAvatars(newAvatars);
+        localStorage.setItem("avatars", JSON.stringify(newAvatars));
       } catch (error) {
         setError("Failed to fetch users");
       }
@@ -39,25 +53,48 @@ const ChatList = ({ onSelectChat }) => {
     fetchUsers();
   }, [searchTerm]);
 
+  const handleSelectChat = (user) => {
+    onSelectChat({
+      chatId: user._id,
+      avatar: avatars[user._id],
+      name: `${user.firstName} ${user.lastName}`,
+    });
+  };
+
   return (
-    <div className="chat-list-container">
+    <motion.div
+      className="chat-list-container"
+      initial={{ opacity: 0, x: -50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <SearchBar onSearch={(term) => setSearchTerm(term)} />
-      <h2>Chats</h2>
+      <h2 className="chat-list-title">Чати</h2>
       {error && <div className="error">{error}</div>}
-      {users.map((user) => (
-        <div key={user._id} onClick={() => onSelectChat(user._id)}>
-          <User
-            firstName={user.firstName}
-            lastName={user.lastName}
-            avatar={user.avatar || faker.image.avatar()}
-            lastMessage={lastMessages[user._id]?.content}
-            lastDate={new Date(
-              lastMessages[user._id]?.createdAt
-            ).toLocaleString()}
-          />
+      <div className="chat-list">
+        <div className="chat-list-scrollable">
+          {users.map((user) => (
+            <motion.div
+              key={user._id}
+              onClick={() => handleSelectChat(user)}
+              className="chat-item"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <User
+                firstName={user.firstName}
+                lastName={user.lastName}
+                avatar={avatars[user._id]}
+                lastMessage={lastMessages[user._id]?.content}
+                lastDate={new Date(
+                  lastMessages[user._id]?.createdAt
+                ).toLocaleString()}
+              />
+            </motion.div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+    </motion.div>
   );
 };
 
