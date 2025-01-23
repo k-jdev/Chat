@@ -82,13 +82,13 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
-        state.user = action.payload;
         state.isLoading = null;
         localStorage.setItem("user", JSON.stringify(action.payload));
+        state.user = action.payload;
       })
       .addCase(register.rejected, (state, action) => {
-        state.error = action.payload;
         state.isLoading = null;
+        state.error = action.error;
       })
       .addCase(googleLogin.fulfilled, (state, action) => {
         state.user = action.payload;

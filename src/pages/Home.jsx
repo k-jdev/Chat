@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../App.css";
-import ChatList from "../components/ChatList";
+import ChatList from "../components/Chat/ChatList";
 import ChatArea from "../components/Chat/ChatArea";
 import { useDispatch } from "react-redux";
 import { logout } from "../store/features/authSlice";

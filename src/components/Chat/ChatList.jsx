@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { getUsers, searchChats, getLastMessageByChatId } from "../http/api";
-import "../styles/ChatList.css";
-import User from "./User";
-import SearchBar from "./SideBar/SearchBar";
+import { getUsers, searchChats, getLastMessageByChatId } from "../../http/api";
+import "../../styles/ChatList.css";
+import User from "../User";
+import SearchBar from "../SideBar/SearchBar";
 import { faker } from "@faker-js/faker";
+import ProfileModal from "./../SideBar/ProfileModal";
 
 const ChatList = ({ onSelectChat }) => {
   const [users, setUsers] = useState([]);
@@ -12,6 +13,11 @@ const ChatList = ({ onSelectChat }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
   const [avatars, setAvatars] = useState({});
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -68,7 +74,11 @@ const ChatList = ({ onSelectChat }) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <SearchBar onSearch={(term) => setSearchTerm(term)} />
+      <div className="chat-list-header">
+        {" "}
+        <SearchBar onSearch={(term) => setSearchTerm(term)} />
+        <ProfileModal isVisible={isModalVisible} onClose={toggleModal} />
+      </div>
       <h2 className="chat-list-title">Чати</h2>
       {error && <div className="error">{error}</div>}
       <div className="chat-list">

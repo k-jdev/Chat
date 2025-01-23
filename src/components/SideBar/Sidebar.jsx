@@ -1,7 +1,7 @@
 import { de } from "@faker-js/faker";
 import "../../styles/Sidebar.css";
 import SearchBar from "./SearchBar";
-import ChatList from "./../ChatList";
+import ChatList from "../Chat/ChatList";
 
 const Sidebar = ({ onSelectChat }) => {
   return (

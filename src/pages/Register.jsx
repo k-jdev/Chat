@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { register, googleLogin } from "../store/features/authSlice";
-import { GoogleLogin } from "@react-oauth/google";
+import { register } from "../store/features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import styles from "../styles/Register.module.css";
@@ -24,6 +23,7 @@ function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
     if (
       !formData.firstName ||
       !formData.lastName ||
@@ -34,23 +34,14 @@ function Register() {
       return;
     }
 
-    const result = await dispatch(register(formData));
+    const result = await dispatch(register(formData)); // Додано await
     if (register.fulfilled.match(result)) {
-      const user = result.payload; // Данные пользователя
-      localStorage.setItem("user", JSON.stringify(user)); // Сохраняем в localStorage
-      navigate("/");
+      const user = result.payload; // Данні користувача
+      localStorage.setItem("user", JSON.stringify(user)); // Збереження в localStorage
+      navigate("/"); // Перенаправлення після успішної реєстрації
+    } else {
+      console.error("Registration failed:", result.error.message);
     }
-  };
-
-  const handleGoogleSuccess = async (response) => {
-    const token = response.credential;
-    dispatch(googleLogin(token)).then((result) => {
-      if (googleLogin.fulfilled.match(result)) {
-        const user = result.payload;
-        localStorage.setItem("user", JSON.stringify(user)); // Сохраняем Google пользователя
-        navigate("/");
-      }
-    });
   };
 
   return (
@@ -107,13 +98,6 @@ function Register() {
         >
           {isLoading ? "Реєструємо..." : "Зареєструватись"}
         </motion.button>
-
-        <div className={styles.googleLogin}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => console.log("Google Login Failed")}
-          />
-        </div>
 
         {error && <p className={styles.error}>{error.message}</p>}
 
