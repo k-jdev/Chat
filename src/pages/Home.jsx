@@ -16,12 +16,14 @@ function Home() {
 
   return (
     <div className="app">
-      <ChatList onSelectChat={(chat) => setSelectedChat(chat)} />
+      <div>
+        <ChatList onSelectChat={(chat) => setSelectedChat(chat)} />
+      </div>
       {selectedChat ? (
         <ChatArea chatId={selectedChat.chatId} chatInfo={selectedChat} />
       ) : (
         <div className="chat-area-placeholder">
-          <h2>Виберіть чат</h2>
+          <h2 className="chat-area__h2">Виберіть чат</h2>
         </div>
       )}
     </div>

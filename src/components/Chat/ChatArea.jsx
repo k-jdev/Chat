@@ -79,7 +79,6 @@ const ChatArea = ({ chatId, chatInfo }) => {
 
   return (
     <div className="chat-area">
-      {/* Используем переданную аватарку */}
       <ChatHeader name={chatInfo.name} avatar={chatInfo.avatar} />
       {error && <div className="error">{error}</div>}
       <div className="chat-area__messages">
