@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, googleLogin } from "../store/features/authSlice";
-import { GoogleLogin } from "@react-oauth/google";
+import { login } from "../store/features/authSlice";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import styles from "../styles/Login.module.css";
@@ -33,17 +32,6 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(user)); // Сохраняем в localStorage
       navigate("/");
     }
-  };
-
-  const handleGoogleSuccess = async (response) => {
-    const token = response.credential;
-    dispatch(googleLogin(token)).then((result) => {
-      if (googleLogin.fulfilled.match(result)) {
-        const user = result.payload;
-        localStorage.setItem("user", JSON.stringify(user)); // Сохраняем Google пользователя
-        navigate("/");
-      }
-    });
   };
 
   return (
@@ -82,13 +70,6 @@ function Login() {
         >
           {isLoading ? "Входимо..." : "Увійти"}
         </motion.button>
-
-        <div className={styles.googleLogin}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => console.log("Google Login Failed")}
-          />
-        </div>
 
         {error && <p className={styles.error}>{error.message}</p>}
 

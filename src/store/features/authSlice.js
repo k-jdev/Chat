@@ -69,9 +69,9 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = action.payload.user; // Берём user из payload
         state.isLoading = null;
-        localStorage.setItem("user", JSON.stringify(action.payload));
+        localStorage.setItem("user", JSON.stringify(action.payload)); // Сохраняем весь объект
       })
       .addCase(login.rejected, (state, action) => {
         state.error = action.payload;
@@ -82,9 +82,9 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
+        state.user = action.payload.user; // Берём user из payload
         state.isLoading = null;
-        localStorage.setItem("user", JSON.stringify(action.payload));
-        state.user = action.payload;
+        localStorage.setItem("user", JSON.stringify(action.payload)); // Сохраняем весь объект
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = null;

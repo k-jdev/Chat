@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+
 import { getUsers, searchChats, getLastMessageByChatId } from "../../http/api";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/features/authSlice";
+
 import "../../styles/ChatList.css";
+
 import User from "../User";
 import SearchBar from "../SideBar/SearchBar";
 import ProfileModal from "./../SideBar/ProfileModal";
+
 import { faker } from "@faker-js/faker";
+import { motion } from "framer-motion";
 
 const ChatList = ({ onSelectChat }) => {
   const dispatch = useDispatch();
@@ -18,14 +22,17 @@ const ChatList = ({ onSelectChat }) => {
   const [error, setError] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  // Обробник відкриття/закриття модального вікна
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
 
+  // Обробник виходу з акаунта
   const handleLogout = () => {
     dispatch(logout());
   };
 
+  // Отримуємо користувачів при завантаженні компонента
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -63,14 +70,14 @@ const ChatList = ({ onSelectChat }) => {
     fetchUsers();
   }, [searchTerm]);
 
+  // Обробник вибору чату
   const handleSelectChat = (user) => {
     onSelectChat({
       chatId: user._id,
       name: `${user.firstName} ${user.lastName}`,
-      avatar: avatarsCache[user._id], // Передаем кэшированную аватарку
+      avatar: avatarsCache[user._id],
     });
   };
-
   return (
     <motion.div
       className="chat-list-container"
@@ -87,7 +94,7 @@ const ChatList = ({ onSelectChat }) => {
           isVisible={isModalVisible}
           onClose={toggleModal}
           handleLogout={handleLogout}
-          user={{ firstName: "Ім'я", lastName: "Користувача" }}
+          user={JSON.parse(localStorage.getItem("user"))?.user}
         />
       </div>
       <h2 className="chat-list-title">Чати</h2>
@@ -105,7 +112,7 @@ const ChatList = ({ onSelectChat }) => {
               <User
                 firstName={user.firstName}
                 lastName={user.lastName}
-                avatar={avatarsCache[user._id]} // Используем кэшированную аватарку
+                avatar={avatarsCache[user._id]}
                 lastMessage={lastMessages[user._id]?.content}
                 lastDate={new Date(
                   lastMessages[user._id]?.createdAt
