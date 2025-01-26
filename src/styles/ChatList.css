@@ -101,3 +101,20 @@ body {
   .chat-list-scrollable::-webkit-scrollbar-thumb:hover {
     background-color: #555;
   }
+
+  .profile-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .profile-button:hover {
+    background-color: #0056b3;
+  }
+  

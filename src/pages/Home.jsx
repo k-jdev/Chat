@@ -20,7 +20,9 @@ function Home() {
       {selectedChat ? (
         <ChatArea chatId={selectedChat.chatId} chatInfo={selectedChat} />
       ) : (
-        <button onClick={handleLogout}>Logout</button>
+        <div className="chat-area-placeholder">
+          <h2>Виберіть чат</h2>
+        </div>
       )}
     </div>
   );

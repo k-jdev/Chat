@@ -1,22 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { getUsers, searchChats, getLastMessageByChatId } from "../../http/api";
+import { useDispatch } from "react-redux";
+import { logout } from "../../store/features/authSlice";
 import "../../styles/ChatList.css";
 import User from "../User";
 import SearchBar from "../SideBar/SearchBar";
-import { faker } from "@faker-js/faker";
 import ProfileModal from "./../SideBar/ProfileModal";
+import { faker } from "@faker-js/faker";
 
 const ChatList = ({ onSelectChat }) => {
+  const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [lastMessages, setLastMessages] = useState({});
+  const [avatarsCache, setAvatarsCache] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
-  const [avatars, setAvatars] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
   };
 
   useEffect(() => {
@@ -28,31 +35,28 @@ const ChatList = ({ onSelectChat }) => {
 
         setUsers(fetchedUsers);
 
+        // Кэшируем аватарки при первом рендере
+        const updatedAvatarsCache = { ...avatarsCache };
+        fetchedUsers.forEach((user) => {
+          if (!updatedAvatarsCache[user._id]) {
+            updatedAvatarsCache[user._id] = user.avatar || faker.image.avatar();
+          }
+        });
+        setAvatarsCache(updatedAvatarsCache);
+
         const lastMessagesData = {};
         await Promise.all(
           fetchedUsers.map(async (user) => {
             const lastMessage = await getLastMessageByChatId(user._id);
             lastMessagesData[user._id] = lastMessage || {
-              content: "No messages yet",
+              content: "Повідомлень немає",
               createdAt: "",
             };
           })
         );
         setLastMessages(lastMessagesData);
-
-        const storedAvatars = JSON.parse(localStorage.getItem("avatars")) || {};
-        const newAvatars = { ...storedAvatars };
-
-        fetchedUsers.forEach((user) => {
-          if (!storedAvatars[user._id]) {
-            newAvatars[user._id] = user.avatar || faker.image.avatar();
-          }
-        });
-
-        setAvatars(newAvatars);
-        localStorage.setItem("avatars", JSON.stringify(newAvatars));
       } catch (error) {
-        setError("Failed to fetch users");
+        setError("Помилка завантаження користувачів");
       }
     };
 
@@ -62,8 +66,8 @@ const ChatList = ({ onSelectChat }) => {
   const handleSelectChat = (user) => {
     onSelectChat({
       chatId: user._id,
-      avatar: avatars[user._id],
       name: `${user.firstName} ${user.lastName}`,
+      avatar: avatarsCache[user._id], // Передаем кэшированную аватарку
     });
   };
 
@@ -75,9 +79,16 @@ const ChatList = ({ onSelectChat }) => {
       transition={{ duration: 0.5 }}
     >
       <div className="chat-list-header">
-        {" "}
         <SearchBar onSearch={(term) => setSearchTerm(term)} />
-        <ProfileModal isVisible={isModalVisible} onClose={toggleModal} />
+        <button className="profile-button" onClick={toggleModal}>
+          Профіль
+        </button>
+        <ProfileModal
+          isVisible={isModalVisible}
+          onClose={toggleModal}
+          handleLogout={handleLogout}
+          user={{ firstName: "Ім'я", lastName: "Користувача" }}
+        />
       </div>
       <h2 className="chat-list-title">Чати</h2>
       {error && <div className="error">{error}</div>}
@@ -94,7 +105,7 @@ const ChatList = ({ onSelectChat }) => {
               <User
                 firstName={user.firstName}
                 lastName={user.lastName}
-                avatar={avatars[user._id]}
+                avatar={avatarsCache[user._id]} // Используем кэшированную аватарку
                 lastMessage={lastMessages[user._id]?.content}
                 lastDate={new Date(
                   lastMessages[user._id]?.createdAt

@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import "../../styles/ProfileModal.css";
 
-const ProfileModal = ({ isVisible, onClose, user }) => {
+const ProfileModal = ({ isVisible, onClose, user, handleLogout }) => {
   const modalVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 },
@@ -28,7 +28,7 @@ const ProfileModal = ({ isVisible, onClose, user }) => {
             <ul>
               <li>View Profile</li>
               <li>Edit Profile</li>
-              <li>Logout</li>
+              <li onClick={handleLogout}>Logout</li>
             </ul>
           </div>
         </motion.div>
