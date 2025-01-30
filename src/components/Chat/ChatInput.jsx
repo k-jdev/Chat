@@ -3,12 +3,18 @@ import { PiTelegramLogo } from "react-icons/pi";
 import { motion } from "framer-motion";
 import styles from "../../styles/ChatInput.module.css";
 
-const ChatInput = ({ onSendMessage }) => {
+const ChatInput = ({ onSendMessage, currentUser, chatInfo }) => {
   const [input, setInput] = useState("");
 
   const handleSend = () => {
     if (input.trim()) {
-      onSendMessage(input);
+      const messageData = {
+        content: input,
+        sender: currentUser._id, // текущий пользователь - отправитель
+        receiver: chatInfo.chatId, // ID собеседника
+      };
+
+      onSendMessage(messageData);
       setInput("");
     }
   };

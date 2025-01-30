@@ -24,8 +24,8 @@ const ProfileModal = ({ isVisible, onClose, currentUser, handleLogout }) => {
             &times;
           </button>
           <div className="profile-modal__content">
-            <h3>{`${currentUser.user.firstName} ${currentUser.user.lastName}`}</h3>
-            <p>{`${currentUser.user.id}`}</p>
+            <h3>{`${currentUser.firstName} ${currentUser.lastName}`}</h3>
+            <p>{`${currentUser.id}`}</p>
             <ul>
               <li>View Profile</li>
               <li>Edit Profile</li>

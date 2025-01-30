@@ -19,13 +19,13 @@ function Home() {
     <div className="app">
       <div>
         <ChatList
-          currentUser={currentUser}
+          currentUser={currentUser.user}
           onSelectChat={(chat) => setSelectedChat(chat)}
         />
       </div>
       {selectedChat ? (
         <ChatArea
-          currentUser={currentUser}
+          currentUser={currentUser.user}
           chatId={selectedChat.chatId}
           chatInfo={selectedChat}
         />

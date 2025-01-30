@@ -59,7 +59,25 @@ const ChatArea = ({ chatId, chatInfo, currentUser }) => {
 
   const handleSendMessage = async (content) => {
     try {
-      const newMessage = await sendMessage(chatId, content, currentUser);
+      // Перевірка, чи chatInfo та chatInfo.participants визначені
+      if (!chatInfo || !Array.isArray(chatInfo.participants)) {
+        throw new Error("Невірна структура даних учасників чату");
+      }
+
+      const receiverId = chatInfo.participants.find(
+        (p) => p !== currentUser.id
+      ); // Знайти іншого учасника
+
+      if (!receiverId) {
+        throw new Error("Не знайдено іншого учасника чату");
+      }
+
+      const newMessage = await sendMessage(
+        chatId,
+        content,
+        currentUser.id,
+        receiverId
+      );
       setMessages((prev) => [...prev, newMessage]);
 
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -69,12 +87,13 @@ const ChatArea = ({ chatId, chatInfo, currentUser }) => {
             chatId,
             content,
             _id: newMessage._id,
-            sender: currentUser,
+            sender: currentUser.id,
           })
         );
       }
     } catch (err) {
-      setError("Ошибка отправки сообщения");
+      console.log(err);
+      // setError("Помилка відправки повідомлення");
     }
   };
 
@@ -84,10 +103,19 @@ const ChatArea = ({ chatId, chatInfo, currentUser }) => {
       {error && <div className="error">{error}</div>}
       <div className="chat-area__messages">
         {messages.map((message) => (
-          <Message key={message._id} {...message} sender={message.sender._id} />
+          <Message
+            key={message._id}
+            {...message}
+            sender={message.sender._id}
+            currentUser={currentUser}
+          />
         ))}
       </div>
-      <ChatInput onSendMessage={handleSendMessage} />
+      <ChatInput
+        onSendMessage={handleSendMessage}
+        currentUser={currentUser}
+        chatInfo={chatInfo}
+      />
     </div>
   );
 };

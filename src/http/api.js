@@ -25,16 +25,23 @@ export const createChat = async (firstName, lastName) => {
   }
 };
 
-export const sendMessage = async (chatId, content, sender) => {
+export const sendMessage = async (chatId, content, sender, receiver) => {
   try {
+    console.log("Відправка повідомлення:", {
+      chatId,
+      content,
+      sender,
+      receiver,
+    });
     const response = await axios.post(`${API_URL}/messages`, {
       chatId,
       content,
       sender,
+      receiver, // Передаємо, але сервер не зберігає
     });
     return response.data;
   } catch (error) {
-    console.error("Error sending message:", error);
+    console.error("Помилка при відправці повідомлення:", error);
     throw error;
   }
 };
