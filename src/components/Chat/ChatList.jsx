@@ -13,7 +13,7 @@ import ProfileModal from "./../SideBar/ProfileModal";
 import { faker } from "@faker-js/faker";
 import { motion } from "framer-motion";
 
-const ChatList = ({ onSelectChat }) => {
+const ChatList = ({ onSelectChat, currentUser }) => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [lastMessages, setLastMessages] = useState({});
@@ -94,7 +94,7 @@ const ChatList = ({ onSelectChat }) => {
           isVisible={isModalVisible}
           onClose={toggleModal}
           handleLogout={handleLogout}
-          user={JSON.parse(localStorage.getItem("user"))?.user}
+          currentUser={currentUser}
         />
       </div>
       <h2 className="chat-list-title">Чати</h2>

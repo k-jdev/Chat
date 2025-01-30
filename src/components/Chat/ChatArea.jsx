@@ -5,7 +5,7 @@ import ChatInput from "./ChatInput";
 import Message from "./Message";
 import { getMessagesByChat, sendMessage } from "../../http/api";
 
-const ChatArea = ({ chatId, chatInfo }) => {
+const ChatArea = ({ chatId, chatInfo, currentUser }) => {
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const [ws, setWs] = useState(null);
@@ -59,7 +59,7 @@ const ChatArea = ({ chatId, chatInfo }) => {
 
   const handleSendMessage = async (content) => {
     try {
-      const newMessage = await sendMessage(chatId, content, "user");
+      const newMessage = await sendMessage(chatId, content, currentUser);
       setMessages((prev) => [...prev, newMessage]);
 
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -69,6 +69,7 @@ const ChatArea = ({ chatId, chatInfo }) => {
             chatId,
             content,
             _id: newMessage._id,
+            sender: currentUser,
           })
         );
       }
@@ -83,7 +84,7 @@ const ChatArea = ({ chatId, chatInfo }) => {
       {error && <div className="error">{error}</div>}
       <div className="chat-area__messages">
         {messages.map((message) => (
-          <Message key={message._id} {...message} />
+          <Message key={message._id} {...message} sender={message.sender._id} />
         ))}
       </div>
       <ChatInput onSendMessage={handleSendMessage} />

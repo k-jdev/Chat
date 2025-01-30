@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import "../../styles/ProfileModal.css";
 
-const ProfileModal = ({ isVisible, onClose, user, handleLogout }) => {
+const ProfileModal = ({ isVisible, onClose, currentUser, handleLogout }) => {
   const modalVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 },
@@ -24,7 +24,8 @@ const ProfileModal = ({ isVisible, onClose, user, handleLogout }) => {
             &times;
           </button>
           <div className="profile-modal__content">
-            <h3>{`${user.firstName} ${user.lastName}`}</h3>
+            <h3>{`${currentUser.user.firstName} ${currentUser.user.lastName}`}</h3>
+            <p>{`${currentUser.user.id}`}</p>
             <ul>
               <li>View Profile</li>
               <li>Edit Profile</li>

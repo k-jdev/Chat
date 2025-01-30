@@ -29,6 +29,7 @@ const Message = ({ content, createdAt, sender }) => {
       <div className="message__wrapper">
         <div className="message__content">{content}</div>
         <div className="message__time">{formattedTime}</div>
+        <div className="message__sender">{sender}</div>
       </div>
     </div>
   );
